@@ -27,10 +27,20 @@
             <p class="text-gray-600 mt-2">Sử dụng Tesseract.js để nhận dạng ký tự (OCR) ngay trên trình duyệt của bạn.</p>
         </div>
 
+        <!-- Language Selection -->
+        <div>
+            <label for="lang-select" class="block text-lg font-medium text-gray-700 mb-2">1. Chọn ngôn ngữ nhận dạng</label>
+            <select id="lang-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                <option value="vie" selected>Tiếng Việt</option>
+                <option value="eng">Tiếng Anh (English)</option>
+                <option value="chi_sim">Tiếng Trung (Simplified Chinese)</option>
+            </select>
+        </div>
+
         <!-- Input Section: File Upload or Camera -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-gray-50 p-6 rounded-lg">
             <div>
-                <label class="block text-lg font-medium text-gray-700 mb-2">1. Tải ảnh lên</label>
+                <label class="block text-lg font-medium text-gray-700 mb-2">2. Tải ảnh lên</label>
                 <div class="flex items-center justify-center w-full">
                     <label for="image-upload" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-white hover:bg-gray-100 transition-colors">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
@@ -61,7 +71,7 @@
 
         <!-- Image Preview & OCR Trigger -->
         <div id="image-display" class="hidden text-center space-y-4 pt-4">
-             <h2 class="text-xl font-semibold text-gray-700">2. Xem trước & Trích xuất</h2>
+             <h2 class="text-xl font-semibold text-gray-700">3. Xem trước & Trích xuất</h2>
             <div class="flex justify-center bg-gray-100 p-4 rounded-lg">
                 <img id="preview-image" src="#" alt="Image preview" class="max-w-full max-h-96 mx-auto rounded-lg shadow-md object-contain"/>
             </div>
@@ -72,7 +82,7 @@
 
         <!-- Progress and Result Section -->
         <div id="result-section" class="hidden space-y-4 pt-4">
-            <h2 class="text-xl font-semibold text-gray-700">3. Kết quả</h2>
+            <h2 class="text-xl font-semibold text-gray-700">4. Kết quả</h2>
             <!-- Progress Bar -->
             <div id="progress-container" class="w-full bg-gray-200 rounded-full h-2.5 hidden">
                  <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -102,6 +112,7 @@
     const progressBar = document.getElementById('progress-bar');
     const progressLabel = document.getElementById('progress-label');
     const copyBtn = document.getElementById('copy-btn');
+    const langSelect = document.getElementById('lang-select');
     
     // Các đối tượng DOM cho camera
     const startCameraBtn = document.getElementById('start-camera-btn');
@@ -181,9 +192,11 @@
         progressBar.style.width = '0%';
         progressLabel.innerText = 'Đang khởi tạo...';
         extractBtn.disabled = true;
+
+        const selectedLang = langSelect.value;
         
-        // Tạo một worker Tesseract để xử lý OCR cho tiếng Việt
-        const worker = await Tesseract.createWorker('vie', 1, {
+        // Tạo một worker Tesseract để xử lý OCR với ngôn ngữ đã chọn
+        const worker = await Tesseract.createWorker(selectedLang, 1, {
             logger: m => { // Theo dõi tiến trình
                 console.log(m);
                 if (m.status === 'recognizing text') {
@@ -192,7 +205,7 @@
                     progressLabel.innerText = `Đang nhận dạng... ${progress}%`;
                 } else {
                     const statusText = m.status.charAt(0).toUpperCase() + m.status.slice(1);
-                    progressLabel.innerText = statusText.replace('_', ' ');
+                    progressLabel.innerText = statusText.replace(/_/g, ' ');
                 }
             },
         });
@@ -238,3 +251,4 @@
 
 </body>
 </html>
+
